@@ -575,6 +575,11 @@
     <p>Margine netto in tempo reale · dati da Firebase</p>
   </div>
 
+  <!-- Debug box -->
+  <div id="debugBox" style="background:#fff3cd; border:1px solid #ffc107; border-radius:10px; padding:12px 16px; margin-bottom:1rem; font-size:12px; font-weight:600; color:#856404; display:none;">
+    🔍 <span id="debugText"></span>
+  </div>
+
   <!-- Filter -->
   <div class="filter-bar">
     <span class="filter-label">Periodo</span>
@@ -889,6 +894,19 @@ function render() {
 db.ref('contracts').on('value', snapshot => {
   allContracts = [];
   snapshot.forEach(child => allContracts.push({ ...child.val(), id: child.key }));
+
+  // Debug
+  const debugBox  = document.getElementById('debugBox');
+  const debugText = document.getElementById('debugText');
+  debugBox.style.display = 'block';
+
+  if (allContracts.length === 0) {
+    debugText.textContent = 'Firebase connesso ma nessun contratto trovato nel database.';
+  } else {
+    const mesi = [...new Set(allContracts.map(c => c.meseProduzione || 'N/D'))].sort();
+    debugText.innerHTML = `Firebase OK · ${allContracts.length} contratti caricati · Mesi presenti: <strong>${mesi.join(', ')}</strong>`;
+  }
+
   render();
 });
 
