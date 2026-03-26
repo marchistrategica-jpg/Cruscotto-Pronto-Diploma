@@ -534,6 +534,24 @@
 
     footer span { color: var(--green); font-weight: 700; }
 
+    /* ── DETAIL BUTTON ── */
+    .detail-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #8BC53F 0%, #6B6B5A 100%);
+      color: white;
+      border: none;
+      border-radius: var(--radius-xl);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 1rem;
+      letter-spacing: 0.02em;
+      transition: opacity 0.2s;
+    }
+    .detail-btn:hover { opacity: 0.9; }
+
     /* ── RESPONSIVE ── */
     @media (min-width: 600px) {
       main { padding: 2rem 1.5rem 5rem; }
@@ -573,11 +591,6 @@
   <div class="page-header">
     <h1>Monitoraggio BEP</h1>
     <p>Margine netto in tempo reale · dati da Firebase</p>
-  </div>
-
-  <!-- Debug box -->
-  <div id="debugBox" style="background:#fff3cd; border:1px solid #ffc107; border-radius:10px; padding:12px 16px; margin-bottom:1rem; font-size:12px; font-weight:600; color:#856404; display:none;">
-    🔍 <span id="debugText"></span>
   </div>
 
   <!-- Filter -->
@@ -691,36 +704,163 @@
     </table>
   </div>
 
-  <!-- Legend / Parametri -->
-  <div class="legend-card">
-    <div class="section-title">Parametri di Calcolo</div>
-    <div class="legend-body">
-      <div class="legend-row">
-        <span class="leg-key">Margine lordo per contratto</span>
-        <span class="leg-val">€3.230</span>
-      </div>
-      <div class="legend-row">
-        <span class="leg-key">Provvigione Deidda / Poma / Palmas</span>
-        <span class="leg-val" style="color:var(--red)">–€750</span>
-      </div>
-      <div class="legend-row">
-        <span class="leg-key">Provvigione altri consulenti</span>
-        <span class="leg-val" style="color:var(--amber)">–€300</span>
-      </div>
-      <div class="legend-row">
-        <span class="leg-key" style="font-weight:800; color:var(--olive)">Break-Even mensile</span>
-        <span class="leg-val" style="font-size:14px;">€189.950</span>
-      </div>
-    </div>
-  </div>
+  <!-- Dettaglio button -->
+  <button class="detail-btn" onclick="showPage('detail')">📊 Dettaglio Dipendenti / P.IVA</button>
 
 </main>
+
+<!-- ── PAGINA DETTAGLIO ── -->
+<div id="detailPage" style="display:none;">
+  <main>
+    <div class="page-header" style="display:flex; align-items:center; gap:12px;">
+      <button onclick="showPage('main')" style="background:none; border:none; cursor:pointer; font-size:20px; padding:0;">←</button>
+      <div>
+        <h1>Dettaglio per Tipologia</h1>
+        <p id="detailMonthLabel">—</p>
+      </div>
+    </div>
+
+    <!-- Dipendenti -->
+    <div class="vendor-card">
+      <div class="section-title" style="background: linear-gradient(135deg, #8BC53F 0%, #6B6B5A 100%); color:white; --green: white;">👔 Dipendenti <span style="font-weight:400; margin-left:6px; opacity:0.8;">(Deidda · Poma · Palmas)</span></div>
+      <div class="metrics-grid" style="padding: 1rem 1.25rem;">
+        <div class="metric">
+          <div class="m-label">Ricavo Totale</div>
+          <div class="m-value" id="dRicavo">€0</div>
+        </div>
+        <div class="metric">
+          <div class="m-label">Provvigioni</div>
+          <div class="m-value red" id="dProvv">€0</div>
+        </div>
+        <div class="metric" style="grid-column: span 2;">
+          <div class="m-label">Margine Netto</div>
+          <div class="m-value green" id="dNet">€0</div>
+        </div>
+      </div>
+      <table class="vendor-table">
+        <thead>
+          <tr>
+            <th>Consulente</th>
+            <th>CTR</th>
+            <th>Ricavo</th>
+            <th>Provv.</th>
+            <th>Margine Netto</th>
+          </tr>
+        </thead>
+        <tbody id="dBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Partita IVA -->
+    <div class="vendor-card">
+      <div class="section-title" style="background: linear-gradient(135deg, #6B6B5A 0%, #3a4550 100%); color:white;">🧾 Partita IVA</div>
+      <div class="metrics-grid" style="padding: 1rem 1.25rem;">
+        <div class="metric">
+          <div class="m-label">Ricavo Totale</div>
+          <div class="m-value" id="pRicavo">€0</div>
+        </div>
+        <div class="metric">
+          <div class="m-label">Provvigioni</div>
+          <div class="m-value red" id="pProvv">€0</div>
+        </div>
+        <div class="metric" style="grid-column: span 2;">
+          <div class="m-label">Margine Netto</div>
+          <div class="m-value green" id="pNet">€0</div>
+        </div>
+      </div>
+      <table class="vendor-table">
+        <thead>
+          <tr>
+            <th>Consulente</th>
+            <th>CTR</th>
+            <th>Ricavo</th>
+            <th>Provv.</th>
+            <th>Margine Netto</th>
+          </tr>
+        </thead>
+        <tbody id="pBody"></tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
 
 <footer>
   Powered by <span>Pronto Diploma</span> &nbsp;·&nbsp; Dati in tempo reale da Firebase
 </footer>
 
 <script>
+/* ── Navigazione pagine ── */
+function showPage(page) {
+  const mainEl   = document.querySelector('main');
+  const detailEl = document.getElementById('detailPage');
+  if (page === 'detail') {
+    mainEl.style.display   = 'none';
+    detailEl.style.display = 'block';
+    renderDetail();
+  } else {
+    mainEl.style.display   = 'block';
+    detailEl.style.display = 'none';
+  }
+}
+
+/* ── Render Dettaglio ── */
+function renderDetail() {
+  const month = parseInt(document.getElementById('filterMonth').value);
+  const year  = parseInt(document.getElementById('filterYear').value);
+
+  document.getElementById('detailMonthLabel').textContent = `${MONTHS[month]} ${year}`;
+
+  const filtered = allContracts.filter(c => {
+    if (c.stornato) return false;
+    const [cY, cM] = (c.meseProduzione || '').split('-');
+    return parseInt(cM) === month && parseInt(cY) === year;
+  });
+
+  const dipendenti = filtered.filter(c => HIGH_VENDORS.includes((c.venditore || '').toUpperCase().trim()));
+  const piva       = filtered.filter(c => !HIGH_VENDORS.includes((c.venditore || '').toUpperCase().trim()));
+
+  function calcGroup(group) {
+    const vmap = {};
+    let totRicavo = 0, totProvv = 0, totNet = 0, totCtr = 0;
+    group.forEach(c => {
+      const n      = Number(c.numeroContratti || 1);
+      const prezzo = Number(c.prezzo || 0);
+      const comm   = getComm(c.venditore) * n;
+      const net    = prezzo - comm;
+      totRicavo += prezzo; totProvv += comm; totNet += net; totCtr += n;
+      const key = (c.venditore || 'N/D').toUpperCase().trim();
+      if (!vmap[key]) vmap[key] = { ctr: 0, ricavo: 0, provv: 0, net: 0 };
+      vmap[key].ctr += n; vmap[key].ricavo += prezzo; vmap[key].provv += comm; vmap[key].net += net;
+    });
+    return { vmap, totRicavo, totProvv, totNet, totCtr };
+  }
+
+  function buildTable(bodyId, vmap) {
+    const rows = Object.entries(vmap).sort((a, b) => b[1].net - a[1].net);
+    document.getElementById(bodyId).innerHTML = rows.map(([nome, d]) => `
+      <tr>
+        <td><span class="v-name">${nome}</span></td>
+        <td>${d.ctr}</td>
+        <td>${fmt(d.ricavo)}</td>
+        <td class="v-provv">–${fmt(d.provv)}</td>
+        <td class="v-net">${fmt(d.net)}</td>
+      </tr>`).join('');
+  }
+
+  const dData = calcGroup(dipendenti);
+  document.getElementById('dRicavo').textContent = fmt(dData.totRicavo);
+  document.getElementById('dProvv').textContent  = fmt(dData.totProvv);
+  document.getElementById('dNet').textContent    = fmt(dData.totNet);
+  buildTable('dBody', dData.vmap);
+
+  const pData = calcGroup(piva);
+  document.getElementById('pRicavo').textContent = fmt(pData.totRicavo);
+  document.getElementById('pProvv').textContent  = fmt(pData.totProvv);
+  document.getElementById('pNet').textContent    = fmt(pData.totNet);
+  buildTable('pBody', pData.vmap);
+}
+
 /* ── Firebase ── */
 const firebaseConfig = {
   apiKey:            "AIzaSyAKAs06_n8t19KH5CxMGisxZGM1Q5kpiU0",
@@ -905,11 +1045,6 @@ function render() {
 
 /* ── Firebase listener ── */
 function loadData() {
-  const debugBox  = document.getElementById('debugBox');
-  const debugText = document.getElementById('debugText');
-  debugBox.style.display = 'block';
-  debugText.textContent = 'Connessione a Firebase in corso...';
-
   db.ref('contracts').once('value').then(snapshot => {
     allContracts = [];
     const raw = snapshot.val();
@@ -918,16 +1053,9 @@ function loadData() {
         allContracts.push({ ...val, id: key });
       });
     }
-
-    if (allContracts.length === 0) {
-      debugText.textContent = 'Firebase connesso ma nessun contratto trovato nel database.';
-    } else {
-      const mesi = [...new Set(allContracts.map(c => c.meseProduzione || 'N/D'))].sort();
-      debugText.innerHTML = `Firebase OK · ${allContracts.length} contratti caricati · Mesi: <strong>${mesi.slice(0,6).join(', ')}${mesi.length > 6 ? '...' : ''}</strong>`;
-    }
     render();
   }).catch(err => {
-    debugText.textContent = 'Errore connessione Firebase: ' + err.message;
+    console.error('Errore Firebase:', err.message);
   });
 }
 
