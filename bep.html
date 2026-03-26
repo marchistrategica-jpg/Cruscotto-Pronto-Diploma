@@ -901,13 +901,18 @@ function loadData() {
 
   db.ref('contracts').once('value').then(snapshot => {
     allContracts = [];
-    snapshot.forEach(child => allContracts.push({ ...child.val(), id: child.key }));
+    const raw = snapshot.val();
+    if (raw) {
+      Object.entries(raw).forEach(([key, val]) => {
+        allContracts.push({ ...val, id: key });
+      });
+    }
 
     if (allContracts.length === 0) {
       debugText.textContent = 'Firebase connesso ma nessun contratto trovato nel database.';
     } else {
       const mesi = [...new Set(allContracts.map(c => c.meseProduzione || 'N/D'))].sort();
-      debugText.innerHTML = `Firebase OK · ${allContracts.length} contratti caricati · Mesi presenti: <strong>${mesi.join(', ')}</strong>`;
+      debugText.innerHTML = `Firebase OK · ${allContracts.length} contratti caricati · Mesi: <strong>${mesi.slice(0,6).join(', ')}${mesi.length > 6 ? '...' : ''}</strong>`;
     }
     render();
   }).catch(err => {
@@ -915,16 +920,13 @@ function loadData() {
   });
 }
 
-// Ricarica ogni 60 secondi per aggiornamento automatico
-loadData();
-setInterval(loadData, 60000);
-
 /* ── DOMContentLoaded ── */
 document.addEventListener('DOMContentLoaded', () => {
   initFilters();
   document.getElementById('filterMonth').addEventListener('change', render);
   document.getElementById('filterYear').addEventListener('change', render);
   loadData();
+  setInterval(loadData, 60000);
 });
 </script>
 
