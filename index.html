@@ -647,23 +647,38 @@
 
       <div class="metrics-grid">
         <div class="metric">
-          <div class="m-label">Ricavo Totale</div>
+          <div class="m-label">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:3px;vertical-align:middle;"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            Ricavo Totale
+          </div>
           <div class="m-value" id="ricavoTotale">€0</div>
         </div>
         <div class="metric">
-          <div class="m-label">Margine Netto Tot.</div>
+          <div class="m-label">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:3px;vertical-align:middle;"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+            Margine Netto Tot.
+          </div>
           <div class="m-value green" id="margineNetto">€0</div>
         </div>
         <div class="metric">
-          <div class="m-label">Contratti (validi)</div>
+          <div class="m-label">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:3px;vertical-align:middle;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Contratti (validi)
+          </div>
           <div class="m-value" id="numContratti">0</div>
         </div>
         <div class="metric">
-          <div class="m-label">Mancante al BEP</div>
+          <div class="m-label">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:3px;vertical-align:middle;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Mancante al BEP
+          </div>
           <div class="m-value red" id="mancante">€0</div>
         </div>
         <div class="metric">
-          <div class="m-label">Provvigioni Tot.</div>
+          <div class="m-label">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:3px;vertical-align:middle;"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+            Provvigioni Tot.
+          </div>
           <div class="m-value" id="provvigioni">€0</div>
         </div>
       </div>
@@ -688,7 +703,10 @@
 
   <!-- Vendor Breakdown -->
   <div class="vendor-card" id="vendorCard" style="display:none;">
-    <div class="section-title">Dettaglio per Consulente</div>
+    <div class="section-title">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:5px;vertical-align:middle;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Dettaglio per Consulente
+    </div>
     <table class="vendor-table">
       <thead>
         <tr>
@@ -705,7 +723,10 @@
   </div>
 
   <!-- Dettaglio button -->
-  <button class="detail-btn" onclick="showPage('detail')">📊 Dettaglio Dipendenti / P.IVA</button>
+  <button class="detail-btn" onclick="showPage('detail')">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" style="vertical-align:middle; margin-right:8px;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+    Dettaglio Dipendenti / P.IVA
+  </button>
 
 </main>
 
@@ -713,7 +734,10 @@
 <div id="detailPage" style="display:none;">
   <main>
     <div class="page-header" style="display:flex; align-items:center; gap:12px;">
-      <button onclick="showPage('main')" style="background:none; border:none; cursor:pointer; font-size:20px; padding:0;">←</button>
+      <button onclick="showPage('main')" style="background:var(--green); border:none; cursor:pointer; padding:8px 12px; border-radius:10px; display:flex; align-items:center; gap:6px; color:white; font-family:'Montserrat',sans-serif; font-weight:700; font-size:12px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        Torna
+      </button>
       <div>
         <h1>Dettaglio per Tipologia</h1>
         <p id="detailMonthLabel">—</p>
@@ -722,19 +746,38 @@
 
     <!-- Dipendenti -->
     <div class="vendor-card">
-      <div class="section-title" style="background: linear-gradient(135deg, #8BC53F 0%, #6B6B5A 100%); color:white; --green: white;">👔 Dipendenti <span style="font-weight:400; margin-left:6px; opacity:0.8;">(Deidda · Poma · Palmas)</span></div>
+      <div class="section-title" style="background: linear-gradient(135deg, #8BC53F 0%, #6B6B5A 100%); color:white;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" style="margin-right:4px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Dipendenti <span style="font-weight:400; margin-left:6px; opacity:0.8;">(Deidda · Poma · Palmas)</span>
+      </div>
       <div class="metrics-grid" style="padding: 1rem 1.25rem;">
         <div class="metric">
-          <div class="m-label">Ricavo Totale</div>
+          <div class="m-label">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:3px;vertical-align:middle;"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            Ricavo Totale
+          </div>
           <div class="m-value" id="dRicavo">€0</div>
         </div>
         <div class="metric">
-          <div class="m-label">Provvigioni</div>
+          <div class="m-label">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:3px;vertical-align:middle;"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+            Provvigioni
+          </div>
           <div class="m-value red" id="dProvv">€0</div>
         </div>
-        <div class="metric" style="grid-column: span 2;">
-          <div class="m-label">Margine Netto</div>
+        <div class="metric">
+          <div class="m-label">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:3px;vertical-align:middle;"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+            Margine Netto
+          </div>
           <div class="m-value green" id="dNet">€0</div>
+        </div>
+        <div class="metric">
+          <div class="m-label">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:3px;vertical-align:middle;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            CTR
+          </div>
+          <div class="m-value" id="dCtr">0</div>
         </div>
       </div>
       <table class="vendor-table">
@@ -753,19 +796,38 @@
 
     <!-- Partita IVA -->
     <div class="vendor-card">
-      <div class="section-title" style="background: linear-gradient(135deg, #6B6B5A 0%, #3a4550 100%); color:white;">🧾 Partita IVA</div>
+      <div class="section-title" style="background: linear-gradient(135deg, #6B6B5A 0%, #3a4550 100%); color:white;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" style="margin-right:4px;"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        Partita IVA
+      </div>
       <div class="metrics-grid" style="padding: 1rem 1.25rem;">
         <div class="metric">
-          <div class="m-label">Ricavo Totale</div>
+          <div class="m-label">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:3px;vertical-align:middle;"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            Ricavo Totale
+          </div>
           <div class="m-value" id="pRicavo">€0</div>
         </div>
         <div class="metric">
-          <div class="m-label">Provvigioni</div>
+          <div class="m-label">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:3px;vertical-align:middle;"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+            Provvigioni
+          </div>
           <div class="m-value red" id="pProvv">€0</div>
         </div>
-        <div class="metric" style="grid-column: span 2;">
-          <div class="m-label">Margine Netto</div>
+        <div class="metric">
+          <div class="m-label">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:3px;vertical-align:middle;"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+            Margine Netto
+          </div>
           <div class="m-value green" id="pNet">€0</div>
+        </div>
+        <div class="metric">
+          <div class="m-label">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:3px;vertical-align:middle;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            CTR
+          </div>
+          <div class="m-value" id="pCtr">0</div>
         </div>
       </div>
       <table class="vendor-table">
@@ -852,12 +914,14 @@ function renderDetail() {
   document.getElementById('dRicavo').textContent = fmt(dData.totRicavo);
   document.getElementById('dProvv').textContent  = fmt(dData.totProvv);
   document.getElementById('dNet').textContent    = fmt(dData.totNet);
+  document.getElementById('dCtr').textContent    = dData.totCtr;
   buildTable('dBody', dData.vmap);
 
   const pData = calcGroup(piva);
   document.getElementById('pRicavo').textContent = fmt(pData.totRicavo);
   document.getElementById('pProvv').textContent  = fmt(pData.totProvv);
   document.getElementById('pNet').textContent    = fmt(pData.totNet);
+  document.getElementById('pCtr').textContent    = pData.totCtr;
   buildTable('pBody', pData.vmap);
 }
 
