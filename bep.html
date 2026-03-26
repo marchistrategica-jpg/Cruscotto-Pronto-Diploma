@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pronto Diploma – Break-Even</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green:      #8BC53F;
+      --green-dark: #6fa030;
+      --green-pale: #f0f8e4;
+      --olive:      #6B6B5A;
+      --olive-light:#8a8a75;
+      --white:      #ffffff;
+      --gray-50:    #f7f8fa;
+      --gray-100:   #eef0f3;
+      --gray-200:   #d8dde4;
+      --gray-400:   #8a96a3;
+      --gray-700:   #3a4550;
+      --red:        #e74c3c;
+      --red-pale:   #fdecea;
+      --amber:      #f39c12;
+      --radius-md:  10px;
+      --radius-lg:  16px;
+      --radius-xl:  22px;
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-700);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, #8BC53F 0%, #6B6B5A 100%);
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 12px rgba(107,107,90,0.25);
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-text .name {
+      font-size: 17px;
+      font-weight: 800;
+      color: white;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+
+    .brand-text .sub {
+      font-size: 10px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.75);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .live-badge {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: white;
+      background: rgba(255,255,255,0.18);
+      border-radius: 20px;
+      padding: 5px 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #c8f09a;
+      animation: pulse 2s infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(200,240,154,0.5); }
+      50%       { opacity: 0.6; box-shadow: 0 0 0 4px rgba(200,240,154,0); }
+    }
+
+    /* ── MAIN ── */
+    main {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 4rem;
+    }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      margin-bottom: 1.25rem;
+    }
+
+    .page-header h1 {
+      font-size: 21px;
+      font-weight: 800;
+      color: var(--olive);
+      letter-spacing: -0.02em;
+    }
+
+    .page-header p {
+      font-size: 12px;
+      color: var(--gray-400);
+      margin-top: 3px;
+      font-weight: 500;
+    }
+
+    /* ── FILTER BAR ── */
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 1.25rem;
+      align-items: center;
+    }
+
+    .filter-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--gray-400);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+
+    .filter-bar select {
+      flex: 1;
+      padding: 10px 30px 10px 12px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-md);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray-700);
+      background: white;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%238a96a3' d='M5 7L0 2h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      transition: border-color 0.2s;
+    }
+
+    .filter-bar select:focus {
+      outline: none;
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(139,197,63,0.12);
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: white;
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--gray-200);
+      overflow: hidden;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .card-header {
+      padding: 1rem 1.25rem 0.75rem;
+      border-bottom: 1px solid var(--gray-100);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-header .month-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gray-400);
+    }
+
+    /* ── LOADING ── */
+    .loading {
+      padding: 2.5rem;
+      text-align: center;
+    }
+
+    .spinner {
+      width: 28px; height: 28px;
+      border: 3px solid var(--gray-100);
+      border-top-color: var(--green);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto 10px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading p {
+      font-size: 12px;
+      color: var(--gray-400);
+      font-weight: 500;
+    }
+
+    /* ── PROGRESS ── */
+    .progress-section {
+      padding: 1.25rem 1.25rem 0;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 10px;
+    }
+
+    .progress-header .p-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--gray-400);
+    }
+
+    .progress-header .p-pct {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--olive);
+    }
+
+    .progress-track {
+      height: 11px;
+      background: var(--gray-100);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 6px;
+      transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1), background 0.4s;
+    }
+
+    .progress-fill.under {
+      background: linear-gradient(90deg, var(--amber) 0%, var(--red) 100%);
+    }
+
+    .progress-fill.over {
+      background: linear-gradient(90deg, var(--green) 0%, var(--olive) 100%);
+    }
+
+    .progress-legend {
+      margin-top: 5px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--gray-400);
+      text-align: right;
+    }
+
+    /* ── METRICS GRID ── */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 1rem 1.25rem;
+    }
+
+    .metric {
+      background: var(--gray-50);
+      border-radius: var(--radius-md);
+      padding: 0.9rem 1rem;
+    }
+
+    .metric .m-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--gray-400);
+      margin-bottom: 6px;
+    }
+
+    .metric .m-value {
+      font-size: 19px;
+      font-weight: 800;
+      color: var(--olive);
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    .metric .m-value.green { color: var(--green); }
+    .metric .m-value.red   { color: var(--red); }
+
+    /* ── DIVIDER ── */
+    .divider {
+      height: 1px;
+      background: var(--gray-100);
+      margin: 0;
+    }
+
+    /* ── PROFIT BANNER ── */
+    .profit-banner {
+      margin: 0 1.25rem 1.25rem;
+      border-radius: var(--radius-md);
+      padding: 1rem 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.5s, border-color 0.5s;
+    }
+
+    .profit-banner.under {
+      background: var(--red-pale);
+      border: 1px solid #f5c6c2;
+    }
+
+    .profit-banner.over {
+      background: var(--green-pale);
+      border: 1px solid #b5de78;
+    }
+
+    .profit-banner .pb-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--gray-400);
+      margin-bottom: 4px;
+    }
+
+    .profit-banner .pb-value {
+      font-size: 27px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      transition: color 0.5s;
+    }
+
+    .profit-banner.under .pb-value { color: var(--red); }
+    .profit-banner.over  .pb-value { color: var(--green); }
+
+    .status-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 11px;
+      border-radius: 20px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .status-badge.under   { background: #fadbd8; color: var(--red); }
+    .status-badge.over    { background: #c8f09a; color: #3d7a00; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      padding: 2.5rem;
+      text-align: center;
+    }
+
+    .empty-state .es-icon { font-size: 2.5rem; margin-bottom: 10px; }
+
+    .empty-state p {
+      font-size: 13px;
+      color: var(--gray-400);
+      font-weight: 500;
+      line-height: 1.6;
+    }
+
+    /* ── VENDOR CARD ── */
+    .vendor-card {
+      background: white;
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--gray-200);
+      overflow: hidden;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .section-title {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--gray-100);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--olive);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .section-title::before {
+      content: '';
+      display: inline-block;
+      width: 3px;
+      height: 13px;
+      background: var(--green);
+      border-radius: 2px;
+    }
+
+    .vendor-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .vendor-table th {
+      padding: 8px 12px;
+      text-align: left;
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--gray-400);
+      background: var(--gray-50);
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .vendor-table th:not(:first-child) { text-align: right; }
+
+    .vendor-table td {
+      padding: 10px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--gray-700);
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .vendor-table td:not(:first-child) { text-align: right; }
+    .vendor-table tr:last-child td { border-bottom: none; }
+    .vendor-table tbody tr:hover td { background: var(--gray-50); }
+
+    .v-name {
+      font-weight: 700;
+      color: var(--olive);
+      font-size: 13px;
+    }
+
+    .high-tag {
+      display: inline-block;
+      background: #fff3cd;
+      color: #856404;
+      font-size: 9px;
+      padding: 1px 5px;
+      border-radius: 4px;
+      margin-left: 5px;
+      font-weight: 700;
+      vertical-align: middle;
+    }
+
+    .v-provv { color: var(--red); font-weight: 600; }
+    .v-net   { color: var(--green); font-weight: 700; }
+
+    .vendor-table tfoot td {
+      background: var(--gray-50);
+      font-weight: 800;
+      color: var(--olive);
+      font-size: 12px;
+      border-top: 2px solid var(--gray-200);
+    }
+
+    /* ── LEGEND CARD ── */
+    .legend-card {
+      background: white;
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--gray-200);
+      overflow: hidden;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .legend-body {
+      padding: 1rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .legend-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+    }
+
+    .legend-row .leg-key {
+      font-weight: 600;
+      color: var(--gray-700);
+    }
+
+    .legend-row .leg-val {
+      font-weight: 700;
+      color: var(--olive);
+    }
+
+    .legend-row .leg-tag {
+      font-size: 10px;
+      font-weight: 700;
+      background: var(--gray-100);
+      color: var(--gray-400);
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--gray-400);
+      letter-spacing: 0.04em;
+    }
+
+    footer span { color: var(--green); font-weight: 700; }
+
+    /* ── RESPONSIVE ── */
+    @media (min-width: 600px) {
+      main { padding: 2rem 1.5rem 5rem; }
+      header { padding: 1rem 2rem; }
+      .brand-text .name { font-size: 19px; }
+    }
+
+    @media (max-width: 360px) {
+      .metric .m-value { font-size: 16px; }
+      .profit-banner .pb-value { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo-area">
+    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2">
+      <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+      <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+    </svg>
+    <div class="brand-text">
+      <div class="name">Pronto Diploma</div>
+      <div class="sub">Cruscotto Break-Even</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="live-badge">
+      <div class="dot"></div>
+      Live
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="page-header">
+    <h1>Monitoraggio BEP</h1>
+    <p>Margine netto in tempo reale · dati da Firebase</p>
+  </div>
+
+  <!-- Debug box -->
+  <div id="debugBox" style="background:#fff3cd; border:1px solid #ffc107; border-radius:10px; padding:12px 16px; margin-bottom:1rem; font-size:12px; font-weight:600; color:#856404; display:none;">
+    🔍 <span id="debugText"></span>
+  </div>
+
+  <!-- Filter -->
+  <div class="filter-bar">
+    <span class="filter-label">Periodo</span>
+    <select id="filterMonth">
+      <option value="1">Gennaio</option>
+      <option value="2">Febbraio</option>
+      <option value="3">Marzo</option>
+      <option value="4">Aprile</option>
+      <option value="5">Maggio</option>
+      <option value="6">Giugno</option>
+      <option value="7">Luglio</option>
+      <option value="8">Agosto</option>
+      <option value="9">Settembre</option>
+      <option value="10">Ottobre</option>
+      <option value="11">Novembre</option>
+      <option value="12">Dicembre</option>
+    </select>
+    <select id="filterYear">
+      <option value="2024">2024</option>
+      <option value="2025">2025</option>
+      <option value="2026">2026</option>
+      <option value="2027">2027</option>
+      <option value="2028">2028</option>
+    </select>
+  </div>
+
+  <!-- Main BEP Card -->
+  <div class="card">
+    <div class="card-header">
+      <span class="month-label" id="monthLabel">—</span>
+      <div class="dot"></div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loadingState" class="loading">
+      <div class="spinner"></div>
+      <p>Connessione a Firebase…</p>
+    </div>
+
+    <!-- Content -->
+    <div id="mainContent" style="display:none;">
+      <div class="progress-section">
+        <div class="progress-header">
+          <span class="p-label">Avanzamento verso il break-even</span>
+          <span class="p-pct" id="pctLabel">0%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill under" id="progressBar" style="width:0%"></div>
+        </div>
+        <div class="progress-legend">BEP: €189.950</div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="m-label">Margine Netto Tot.</div>
+          <div class="m-value green" id="margineNetto">€0</div>
+        </div>
+        <div class="metric">
+          <div class="m-label">Contratti (validi)</div>
+          <div class="m-value" id="numContratti">0</div>
+        </div>
+        <div class="metric">
+          <div class="m-label">Mancante al BEP</div>
+          <div class="m-value red" id="mancante">€0</div>
+        </div>
+        <div class="metric">
+          <div class="m-label">Provvigioni Tot.</div>
+          <div class="m-value" id="provvigioni">€0</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="profit-banner under" id="profitBanner">
+        <div>
+          <div class="pb-label" id="bannerLabel">Manca ancora al traguardo</div>
+          <div class="pb-value" id="bannerValue">–€0</div>
+        </div>
+        <div class="status-badge under" id="statusBadge">non ancora</div>
+      </div>
+    </div>
+
+    <!-- Empty -->
+    <div id="emptyState" class="empty-state" style="display:none;">
+      <div class="es-icon">📭</div>
+      <p>Nessun contratto trovato<br>per questo periodo.</p>
+    </div>
+  </div>
+
+  <!-- Vendor Breakdown -->
+  <div class="vendor-card" id="vendorCard" style="display:none;">
+    <div class="section-title">Dettaglio per Consulente</div>
+    <table class="vendor-table">
+      <thead>
+        <tr>
+          <th>Consulente</th>
+          <th>CTR</th>
+          <th>Provv.</th>
+          <th>Margine Netto</th>
+        </tr>
+      </thead>
+      <tbody id="vendorBody"></tbody>
+      <tfoot id="vendorFoot"></tfoot>
+    </table>
+  </div>
+
+  <!-- Legend / Parametri -->
+  <div class="legend-card">
+    <div class="section-title">Parametri di Calcolo</div>
+    <div class="legend-body">
+      <div class="legend-row">
+        <span class="leg-key">Margine lordo per contratto</span>
+        <span class="leg-val">€3.230</span>
+      </div>
+      <div class="legend-row">
+        <span class="leg-key">Provvigione Deidda / Poma / Palmas</span>
+        <span class="leg-val" style="color:var(--red)">–€750</span>
+      </div>
+      <div class="legend-row">
+        <span class="leg-key">Provvigione altri consulenti</span>
+        <span class="leg-val" style="color:var(--amber)">–€300</span>
+      </div>
+      <div class="legend-row">
+        <span class="leg-key" style="font-weight:800; color:var(--olive)">Break-Even mensile</span>
+        <span class="leg-val" style="font-size:14px;">€189.950</span>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  Powered by <span>Pronto Diploma</span> &nbsp;·&nbsp; Dati in tempo reale da Firebase
+</footer>
+
+<script>
+/* ── Firebase ── */
+const firebaseConfig = {
+  apiKey:            "AIzaSyAKAs06_n8t19KH5CxMGisxZGM1Q5kpiU0",
+  authDomain:        "pronto-diploma.firebaseapp.com",
+  databaseURL:       "https://pronto-diploma-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:         "pronto-diploma",
+  storageBucket:     "pronto-diploma.appspot.com",
+  messagingSenderId: "640164355453",
+  appId:             "1:640164355453:web:7c79a591af4869c54f4014"
+};
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.database();
+
+/* ── Costanti ── */
+const HIGH_VENDORS = ['DEIDDA', 'POMA', 'PALMAS'];
+const MARGIN_BASE  = 3230;
+const COMM_HIGH    = 750;   // Deidda, Poma, Palmas
+const COMM_LOW     = 300;   // tutti gli altri
+const BEP          = 189950;
+
+const MONTHS = [
+  '', 'Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno',
+  'Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'
+];
+
+/* ── Stato ── */
+let allContracts = [];
+
+/* ── Helpers ── */
+const fmt = v => '€' + Math.round(v).toLocaleString('it-IT');
+
+function getNetUnit(venditore) {
+  const isHigh = HIGH_VENDORS.includes((venditore || '').toUpperCase().trim());
+  return MARGIN_BASE - (isHigh ? COMM_HIGH : COMM_LOW);
+}
+
+function getComm(venditore) {
+  return HIGH_VENDORS.includes((venditore || '').toUpperCase().trim()) ? COMM_HIGH : COMM_LOW;
+}
+
+/* ── Init filtri ── */
+function initFilters() {
+  const now   = new Date();
+  const mSel  = document.getElementById('filterMonth');
+  const ySel  = document.getElementById('filterYear');
+  mSel.value  = String(now.getMonth() + 1);
+  ySel.value  = String(now.getFullYear());
+  if (!ySel.value || ySel.selectedIndex < 0) ySel.value = '2025';
+}
+
+/* ── Render ── */
+function render() {
+  const month = parseInt(document.getElementById('filterMonth').value);
+  const year  = parseInt(document.getElementById('filterYear').value);
+
+  const now          = new Date();
+  const daysInMonth  = new Date(year, month, 0).getDate();
+  const isCurrentMonth = (now.getMonth() + 1 === month && now.getFullYear() === year);
+  const currentDay   = isCurrentMonth ? now.getDate() : daysInMonth;
+
+  document.getElementById('monthLabel').textContent = `${MONTHS[month]} ${year}`;
+
+  const filtered = allContracts.filter(c => {
+    if (c.stornato) return false;
+    const [cY, cM] = (c.meseProduzione || '').split('-');
+    return parseInt(cM) === month && parseInt(cY) === year;
+  });
+
+  document.getElementById('loadingState').style.display = 'none';
+
+  if (filtered.length === 0) {
+    document.getElementById('mainContent').style.display  = 'none';
+    document.getElementById('emptyState').style.display   = 'block';
+    document.getElementById('vendorCard').style.display   = 'none';
+    return;
+  }
+
+  document.getElementById('mainContent').style.display  = 'block';
+  document.getElementById('emptyState').style.display   = 'none';
+  document.getElementById('vendorCard').style.display   = 'block';
+
+  /* Calcoli */
+  let totalNet = 0, totalCtr = 0, totalProvv = 0;
+  const vmap = {};
+
+  filtered.forEach(c => {
+    const n    = Number(c.numeroContratti || 1);
+    const net  = getNetUnit(c.venditore) * n;
+    const comm = getComm(c.venditore) * n;
+
+    totalNet   += net;
+    totalCtr   += n;
+    totalProvv += comm;
+
+    const key = (c.venditore || 'N/D').toUpperCase().trim();
+    if (!vmap[key]) vmap[key] = { ctr: 0, provv: 0, net: 0 };
+    vmap[key].ctr   += n;
+    vmap[key].provv += comm;
+    vmap[key].net   += net;
+  });
+
+  /* Progress */
+  const pct  = Math.min(100, (totalNet / BEP) * 100);
+  const over = totalNet >= BEP;
+
+  document.getElementById('pctLabel').textContent = pct.toFixed(1) + '%';
+  const bar = document.getElementById('progressBar');
+  bar.style.width  = pct + '%';
+  bar.className    = 'progress-fill ' + (over ? 'over' : 'under');
+
+  /* Metrics */
+  document.getElementById('margineNetto').textContent = fmt(totalNet);
+  document.getElementById('numContratti').textContent = totalCtr;
+  document.getElementById('provvigioni').textContent  = fmt(totalProvv);
+  document.getElementById('mancante').textContent     = over ? '–' : fmt(BEP - totalNet);
+
+  if (over) {
+    document.getElementById('mancante').className = 'm-value green';
+  } else {
+    document.getElementById('mancante').className = 'm-value red';
+  }
+
+  /* Profit Banner */
+  const banner = document.getElementById('profitBanner');
+  const label  = document.getElementById('bannerLabel');
+  const value  = document.getElementById('bannerValue');
+  const badge  = document.getElementById('statusBadge');
+
+  if (over) {
+    banner.className   = 'profit-banner over';
+    label.textContent  = 'Utile oltre il break-even';
+    value.textContent  = '+' + fmt(totalNet - BEP);
+    badge.className    = 'status-badge over';
+    // Stima giorno BEP: se il mese è in corso, proporzione
+    const bepDay = Math.ceil((BEP / totalNet) * currentDay);
+    badge.textContent  = 'BEP il giorno ' + Math.min(bepDay, daysInMonth);
+  } else {
+    banner.className   = 'profit-banner under';
+    label.textContent  = 'Manca ancora al traguardo';
+    value.textContent  = '–' + fmt(BEP - totalNet);
+    badge.className    = 'status-badge under';
+    badge.textContent  = 'non ancora';
+  }
+
+  /* Vendor Table */
+  const rows = Object.entries(vmap).sort((a, b) => b[1].net - a[1].net);
+
+  const medals = ['🥇', '🥈', '🥉'];
+  let tbody = '';
+  rows.forEach(([nome, d], i) => {
+    const isHigh = HIGH_VENDORS.includes(nome);
+    const medal  = medals[i] ? medals[i] + ' ' : '';
+    tbody += `
+      <tr>
+        <td>
+          <span class="v-name">${medal}${nome}</span>
+          ${isHigh ? '<span class="high-tag">€750</span>' : ''}
+        </td>
+        <td>${d.ctr}</td>
+        <td class="v-provv">–${fmt(d.provv)}</td>
+        <td class="v-net">${fmt(d.net)}</td>
+      </tr>`;
+  });
+  document.getElementById('vendorBody').innerHTML = tbody;
+
+  document.getElementById('vendorFoot').innerHTML = `
+    <tr>
+      <td>TOTALE</td>
+      <td>${totalCtr}</td>
+      <td class="v-provv">–${fmt(totalProvv)}</td>
+      <td class="v-net">${fmt(totalNet)}</td>
+    </tr>`;
+}
+
+/* ── Firebase listener ── */
+function loadData() {
+  const debugBox  = document.getElementById('debugBox');
+  const debugText = document.getElementById('debugText');
+  debugBox.style.display = 'block';
+  debugText.textContent = 'Connessione a Firebase in corso...';
+
+  db.ref('contracts').once('value').then(snapshot => {
+    allContracts = [];
+    snapshot.forEach(child => allContracts.push({ ...child.val(), id: child.key }));
+
+    if (allContracts.length === 0) {
+      debugText.textContent = 'Firebase connesso ma nessun contratto trovato nel database.';
+    } else {
+      const mesi = [...new Set(allContracts.map(c => c.meseProduzione || 'N/D'))].sort();
+      debugText.innerHTML = `Firebase OK · ${allContracts.length} contratti caricati · Mesi presenti: <strong>${mesi.join(', ')}</strong>`;
+    }
+    render();
+  }).catch(err => {
+    debugText.textContent = 'Errore connessione Firebase: ' + err.message;
+  });
+}
+
+// Ricarica ogni 60 secondi per aggiornamento automatico
+loadData();
+setInterval(loadData, 60000);
+
+/* ── DOMContentLoaded ── */
+document.addEventListener('DOMContentLoaded', () => {
+  initFilters();
+  document.getElementById('filterMonth').addEventListener('change', render);
+  document.getElementById('filterYear').addEventListener('change', render);
+  loadData();
+});
+</script>
+
+</body>
+</html>
