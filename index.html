@@ -420,11 +420,12 @@
       border-bottom: 1px solid var(--gray-100);
     }
 
-    .vendor-table th:first-child { width: 32%; }
-    .vendor-table th:nth-child(2) { width: 10%; }
-    .vendor-table th:nth-child(3) { width: 22%; }
-    .vendor-table th:nth-child(4) { width: 18%; }
-    .vendor-table th:nth-child(5) { width: 18%; }
+    .vendor-table th:first-child { width: 28%; }
+    .vendor-table th:nth-child(2) { width: 8%; }
+    .vendor-table th:nth-child(3) { width: 18%; }
+    .vendor-table th:nth-child(4) { width: 15%; }
+    .vendor-table th:nth-child(5) { width: 15%; }
+    .vendor-table th:nth-child(6) { width: 16%; }
 
     .vendor-table th:not(:first-child) { text-align: right; }
 
@@ -666,6 +667,13 @@
           </div>
           <div class="m-value" id="provvigioni">€0</div>
         </div>
+        <div class="metric">
+          <div class="m-label">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:3px;vertical-align:middle;"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            Tasse ID Tot.
+          </div>
+          <div class="m-value red" id="tasseID">€0</div>
+        </div>
       </div>
 
       <div class="divider"></div>
@@ -699,6 +707,7 @@
           <th>CTR</th>
           <th>Ricavo</th>
           <th>Provv.</th>
+          <th>Tasse ID</th>
           <th>Margine Netto</th>
         </tr>
       </thead>
@@ -772,6 +781,7 @@
             <th>CTR</th>
             <th>Ricavo</th>
             <th>Provv.</th>
+            <th>Tasse ID</th>
             <th>Margine Netto</th>
           </tr>
         </thead>
@@ -822,6 +832,7 @@
             <th>CTR</th>
             <th>Ricavo</th>
             <th>Provv.</th>
+            <th>Tasse ID</th>
             <th>Margine Netto</th>
           </tr>
         </thead>
@@ -869,18 +880,19 @@ function renderDetail() {
 
   function calcGroup(group) {
     const vmap = {};
-    let totRicavo = 0, totProvv = 0, totNet = 0, totCtr = 0;
+    let totRicavo = 0, totProvv = 0, totNet = 0, totCtr = 0, totTasse = 0;
     group.forEach(c => {
       const n      = Number(c.numeroContratti || 1);
       const prezzo = Number(c.prezzo || 0);
       const comm   = getComm(c.venditore) * n;
-      const net    = prezzo - comm;
-      totRicavo += prezzo; totProvv += comm; totNet += net; totCtr += n;
+      const tassa  = TASSA_ID * n;
+      const net    = prezzo - comm - tassa;
+      totRicavo += prezzo; totProvv += comm; totNet += net; totCtr += n; totTasse += tassa;
       const key = (c.venditore || 'N/D').toUpperCase().trim();
-      if (!vmap[key]) vmap[key] = { ctr: 0, ricavo: 0, provv: 0, net: 0 };
-      vmap[key].ctr += n; vmap[key].ricavo += prezzo; vmap[key].provv += comm; vmap[key].net += net;
+      if (!vmap[key]) vmap[key] = { ctr: 0, ricavo: 0, provv: 0, tassa: 0, net: 0 };
+      vmap[key].ctr += n; vmap[key].ricavo += prezzo; vmap[key].provv += comm; vmap[key].tassa += tassa; vmap[key].net += net;
     });
-    return { vmap, totRicavo, totProvv, totNet, totCtr };
+    return { vmap, totRicavo, totProvv, totNet, totCtr, totTasse };
   }
 
   function buildTable(bodyId, vmap) {
@@ -891,6 +903,7 @@ function renderDetail() {
         <td>${d.ctr}</td>
         <td>${fmt(d.ricavo)}</td>
         <td class="v-provv">–${fmt(d.provv)}</td>
+        <td class="v-provv">–${fmt(d.tassa)}</td>
         <td class="v-net">${fmt(d.net)}</td>
       </tr>`).join('');
   }
@@ -930,6 +943,7 @@ const HIGH_VENDORS = ['DEIDDA', 'POMA', 'PALMAS'];
 const MARGIN_BASE  = 3230;
 const COMM_HIGH    = 750;   // Deidda, Poma, Palmas
 const COMM_LOW     = 300;   // tutti gli altri
+const TASSA_ID     = 500;   // tassa per contratto
 const BEP          = 189950;
 
 const MONTHS = [
@@ -994,26 +1008,29 @@ function render() {
   document.getElementById('vendorCard').style.display   = 'block';
 
   /* Calcoli */
-  let totalNet = 0, totalCtr = 0, totalProvv = 0, totalRicavo = 0;
+  let totalNet = 0, totalCtr = 0, totalProvv = 0, totalRicavo = 0, totalTasse = 0;
   const vmap = {};
 
   filtered.forEach(c => {
     const n      = Number(c.numeroContratti || 1);
     const prezzo = Number(c.prezzo || 0);
     const comm   = getComm(c.venditore) * n;
-    const net    = prezzo - comm;
+    const tassa  = TASSA_ID * n;
+    const net    = prezzo - comm - tassa;
 
     totalNet    += net;
     totalCtr    += n;
     totalProvv  += comm;
     totalRicavo += prezzo;
+    totalTasse  += tassa;
 
     const key = (c.venditore || 'N/D').toUpperCase().trim();
-    if (!vmap[key]) vmap[key] = { ctr: 0, provv: 0, net: 0, ricavo: 0 };
+    if (!vmap[key]) vmap[key] = { ctr: 0, provv: 0, net: 0, ricavo: 0, tassa: 0 };
     vmap[key].ctr    += n;
     vmap[key].provv  += comm;
     vmap[key].net    += net;
     vmap[key].ricavo += prezzo;
+    vmap[key].tassa  += tassa;
   });
 
   /* Progress */
@@ -1027,10 +1044,11 @@ function render() {
 
   /* Metrics */
   document.getElementById('ricavoTotale').textContent  = fmt(totalRicavo);
-  document.getElementById('margineNetto').textContent = fmt(totalNet);
-  document.getElementById('numContratti').textContent = totalCtr;
-  document.getElementById('provvigioni').textContent  = fmt(totalProvv);
-  document.getElementById('mancante').textContent     = over ? '–' : fmt(BEP - totalNet);
+  document.getElementById('margineNetto').textContent  = fmt(totalNet);
+  document.getElementById('numContratti').textContent  = totalCtr;
+  document.getElementById('provvigioni').textContent   = fmt(totalProvv);
+  document.getElementById('tasseID').textContent       = fmt(totalTasse);
+  document.getElementById('mancante').textContent      = over ? '–' : fmt(BEP - totalNet);
 
   if (over) {
     document.getElementById('mancante').className = 'm-value green';
@@ -1077,6 +1095,7 @@ function render() {
         <td>${d.ctr}</td>
         <td>${fmt(d.ricavo)}</td>
         <td class="v-provv">–${fmt(d.provv)}</td>
+        <td class="v-provv">–${fmt(d.tassa)}</td>
         <td class="v-net">${fmt(d.net)}</td>
       </tr>`;
   });
@@ -1088,6 +1107,7 @@ function render() {
       <td>${totalCtr}</td>
       <td>${fmt(totalRicavo)}</td>
       <td class="v-provv">–${fmt(totalProvv)}</td>
+      <td class="v-provv">–${fmt(totalTasse)}</td>
       <td class="v-net">${fmt(totalNet)}</td>
     </tr>`;
 }
