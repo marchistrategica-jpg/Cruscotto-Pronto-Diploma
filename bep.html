@@ -634,6 +634,10 @@
 
       <div class="metrics-grid">
         <div class="metric">
+          <div class="m-label">Ricavo Totale</div>
+          <div class="m-value" id="ricavoTotale">€0</div>
+        </div>
+        <div class="metric">
           <div class="m-label">Margine Netto Tot.</div>
           <div class="m-value green" id="margineNetto">€0</div>
         </div>
@@ -677,6 +681,7 @@
         <tr>
           <th>Consulente</th>
           <th>CTR</th>
+          <th>Ricavo</th>
           <th>Provv.</th>
           <th>Margine Netto</th>
         </tr>
@@ -800,23 +805,26 @@ function render() {
   document.getElementById('vendorCard').style.display   = 'block';
 
   /* Calcoli */
-  let totalNet = 0, totalCtr = 0, totalProvv = 0;
+  let totalNet = 0, totalCtr = 0, totalProvv = 0, totalRicavo = 0;
   const vmap = {};
 
   filtered.forEach(c => {
-    const n    = Number(c.numeroContratti || 1);
-    const net  = getNetUnit(c.venditore) * n;
-    const comm = getComm(c.venditore) * n;
+    const n      = Number(c.numeroContratti || 1);
+    const prezzo = Number(c.prezzo || 0);
+    const comm   = getComm(c.venditore) * n;
+    const net    = prezzo - comm;
 
-    totalNet   += net;
-    totalCtr   += n;
-    totalProvv += comm;
+    totalNet    += net;
+    totalCtr    += n;
+    totalProvv  += comm;
+    totalRicavo += prezzo;
 
     const key = (c.venditore || 'N/D').toUpperCase().trim();
-    if (!vmap[key]) vmap[key] = { ctr: 0, provv: 0, net: 0 };
-    vmap[key].ctr   += n;
-    vmap[key].provv += comm;
-    vmap[key].net   += net;
+    if (!vmap[key]) vmap[key] = { ctr: 0, provv: 0, net: 0, ricavo: 0 };
+    vmap[key].ctr    += n;
+    vmap[key].provv  += comm;
+    vmap[key].net    += net;
+    vmap[key].ricavo += prezzo;
   });
 
   /* Progress */
@@ -829,6 +837,7 @@ function render() {
   bar.className    = 'progress-fill ' + (over ? 'over' : 'under');
 
   /* Metrics */
+  document.getElementById('ricavoTotale').textContent  = fmt(totalRicavo);
   document.getElementById('margineNetto').textContent = fmt(totalNet);
   document.getElementById('numContratti').textContent = totalCtr;
   document.getElementById('provvigioni').textContent  = fmt(totalProvv);
@@ -877,6 +886,7 @@ function render() {
           ${isHigh ? '<span class="high-tag">€750</span>' : ''}
         </td>
         <td>${d.ctr}</td>
+        <td>${fmt(d.ricavo)}</td>
         <td class="v-provv">–${fmt(d.provv)}</td>
         <td class="v-net">${fmt(d.net)}</td>
       </tr>`;
@@ -887,6 +897,7 @@ function render() {
     <tr>
       <td>TOTALE</td>
       <td>${totalCtr}</td>
+      <td>${fmt(totalRicavo)}</td>
       <td class="v-provv">–${fmt(totalProvv)}</td>
       <td class="v-net">${fmt(totalNet)}</td>
     </tr>`;
